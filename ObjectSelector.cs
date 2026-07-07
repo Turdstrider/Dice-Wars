@@ -7,15 +7,18 @@ public class ObjectSelector : MonoBehaviour
     private Camera cam;
     private PlayerInput input;
     private InputAction select;
-    [SerializeField] private int ownerNum; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
+    [SerializeField] private int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
+    private const string SelectAction = "Select";
+    public GameObject CurrentSelectedDie;
 
     private void Awake() //triggers when the object awakens.
     {
         cam = Camera.main; //sets the Camera object to the camera that has the MainCamera tag.
+
         input = GetComponent<PlayerInput>(); //gets the components.
 
         //Retrieved from the PlayerInput asset map.
-        select = input.actions["Select"];
+        select = input.actions[SelectAction];
         
     }
 
@@ -54,12 +57,13 @@ public class ObjectSelector : MonoBehaviour
 
         if(Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
         {
-            if(hit.collider.tag == "Dice" && hit.collider.gameObject.GetComponent<SelectionManager>().ownerNum == this.ownerNum) //if Collider is from a Dice that it owns.
+            if(hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.
             {
                 ClearSelection();
                 Debug.Log("Selected");
                 SelectionManager manager = hit.collider.gameObject.GetComponent<SelectionManager>();
-                manager.isSelected = true;
+                manager.Select();
+                CurrentSelectedDie = manager.gameObject; //Set currently selected die to this.
             }
         }
     }
@@ -67,13 +71,10 @@ public class ObjectSelector : MonoBehaviour
     private void ClearSelection()
     {
         Debug.Log("Deselected.");
-        GameObject[] dice = GameObject.FindGameObjectsWithTag("Dice"); //finds every Dice on the scene.
-        foreach (GameObject die in dice)
+        if(CurrentSelectedDie != null)
         {
-            if( die.GetComponent<SelectionManager>().ownerNum == this.ownerNum) //only interacts with dice it owns. 
-            {
-                die.GetComponent<SelectionManager>().isSelected = false;
-            }
+            CurrentSelectedDie.GetComponent<SelectionManager>().DeSelect();
+            CurrentSelectedDie = null; //Set currently selected die to null.
         }
     }
 }
