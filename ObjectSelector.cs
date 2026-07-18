@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class ObjectSelector : MonoBehaviour
@@ -9,7 +7,9 @@ public class ObjectSelector : MonoBehaviour
     private InputAction select;
     [SerializeField] private int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
     private const string SelectAction = "Select";
-    public GameObject CurrentSelectedDie;
+    private IndicatorManager indicatorManager;
+    public GameObject currentSelectedDie;
+    public BasicRollManager currentRollManager;
 
     private void Awake() //triggers when the object awakens.
     {
@@ -19,7 +19,9 @@ public class ObjectSelector : MonoBehaviour
 
         //Retrieved from the PlayerInput asset map.
         select = input.actions[SelectAction];
-        
+
+        indicatorManager = FindFirstObjectByType<IndicatorManager>(); //Finds the IndicatorManager in the scene.
+
     }
 
     //Enables/Disables controls base on if the object is enabled for not.
@@ -55,15 +57,23 @@ public class ObjectSelector : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue(); //Gets the position of the mouse.
         Ray ray = cam.ScreenPointToRay(mousePos); //Create a Ray that goes from the current camera's position to the position of the mouse.
 
-        if(Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
+        
+
+        if (Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
         {
-            if(hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.
+            if (currentRollManager != null) //If there is a currently selected die.
+                currentRollManager.RollDice(hit.point); //Rolls the currently selected die.
+
+            if (hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.
             {
-                ClearSelection();
+                if(currentSelectedDie != null)
+                    currentSelectedDie.GetComponent<SelectionManager>().DeSelect(); //Deselects the currently selected die if there is one.
+               
                 Debug.Log("Selected");
                 SelectionManager manager = hit.collider.gameObject.GetComponent<SelectionManager>();
                 manager.Select();
-                CurrentSelectedDie = manager.gameObject; //Set currently selected die to this.
+                currentSelectedDie = manager.gameObject; //Set currently selected die to this.
+                currentRollManager = indicatorManager.CreateSelectIndicator(); //Creates a select indicator on the selected Die.
             }
         }
     }
@@ -71,11 +81,13 @@ public class ObjectSelector : MonoBehaviour
     private void ClearSelection()
     {
         Debug.Log("Deselected.");
-        if(CurrentSelectedDie != null)
+        if(currentSelectedDie != null)
         {
-            CurrentSelectedDie.GetComponent<SelectionManager>().DeSelect();
-            CurrentSelectedDie = null; //Set currently selected die to null.
+            currentSelectedDie.GetComponent<SelectionManager>().DeSelect();
+            currentSelectedDie = null; //Set currently selected die to null.
+            indicatorManager.DestroySelectIndicator(); //Destroys the select indicator.
+            currentRollManager = null; //Set currentRollManager to null.
         }
     }
 }
-}
+
