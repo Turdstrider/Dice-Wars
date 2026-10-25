@@ -4,9 +4,12 @@ public class ObjectSelector : MonoBehaviour
 {
     private Camera cam;
     private PlayerInput input;
+    private InputActionMap controls;
     private InputAction select;
+    private InputAction scroll;
     [SerializeField] private int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
     private const string SelectAction = "Select";
+    private const string ScrollAction = "Scroll";
     private IndicatorManager indicatorManager;
     public GameObject currentSelectedDie;
     public BasicRollManager currentRollManager;
@@ -15,24 +18,35 @@ public class ObjectSelector : MonoBehaviour
     {
         cam = Camera.main; //sets the Camera object to the camera that has the MainCamera tag.
 
-        input = GetComponent<PlayerInput>(); //gets the components.
+        input = GetComponent<PlayerInput>();
+       
+        controls = input.actions.FindActionMap("Controls");
+       
+        select = controls.FindAction("Select");
+        scroll = controls.FindAction("Scroll");
 
-        //Retrieved from the PlayerInput asset map.
-        select = input.actions[SelectAction];
-
-        indicatorManager = FindFirstObjectByType<IndicatorManager>(); //Finds the IndicatorManager in the scene.
-
+        indicatorManager = FindFirstObjectByType<IndicatorManager>();
+        
     }
 
     //Enables/Disables controls based on if the object is enabled for not.
     private void OnEnable()
     {
-        select.performed += OnSelect;     
+        if (select != null)
+            select.performed += OnSelect;
+        
+        if (scroll != null)
+            scroll.performed += OnScroll;
     }
 
+
     private void OnDisable()
-    {
-        select.performed -= OnSelect;
+    {  
+        if (select != null)
+            select.performed += OnSelect;
+        
+        if (scroll != null)
+            scroll.performed += OnScroll;
     }
 
     private void OnSelect(InputAction.CallbackContext context)
@@ -50,6 +64,14 @@ public class ObjectSelector : MonoBehaviour
             ClearSelection();
         }
           
+    }
+
+    private void OnScroll(InputAction.CallbackContext context)
+    {
+        float scrollValue = context.ReadValue<float>();
+
+        if (currentRollManager != null)
+            currentRollManager.AdjustElevation(scrollValue);
     }
 
     private void SelectAtMouse()
