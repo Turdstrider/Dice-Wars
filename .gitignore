@@ -1,0 +1,11 @@
+
+# Ignore everything by default
+/*
+
+# Allow the Assets folder and its subdirectories
+!/Assets/
+!/Assets/**/
+
+# Allow C# source files under Assets/Scripts
+!/Assets/Scripts/
+!/Assets/Scripts/*.cs
