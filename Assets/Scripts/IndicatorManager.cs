@@ -9,6 +9,8 @@ public class IndicatorManager: MonoBehaviour
     private GameObject hover;
     private GameObject select;
     private MeshRenderer hoverMesh;
+    private Vector3 raycastPoint; //Stores vector3 of raycast hit.
+    private bool isRaycastHit; 
 
     private void Awake()
     {
@@ -39,6 +41,16 @@ public class IndicatorManager: MonoBehaviour
         }
     }
 
+    public Vector3 GetRaycast()
+    {
+        return raycastPoint;
+    }
+
+    public bool GetisRaycastHit()
+    {
+        return isRaycastHit;
+    }
+
     void Update() // Update is called once per frame
     {
         Vector2 mousePos = Mouse.current.position.ReadValue(); //Gets the position of the mouse.
@@ -57,6 +69,12 @@ public class IndicatorManager: MonoBehaviour
             {
                 hoverMesh.enabled = false;
             }
+            raycastPoint = hit.point; //store point of collision.
+            isRaycastHit = true;
+        }
+        else
+        {
+            isRaycastHit = false;
         }
     }
 }

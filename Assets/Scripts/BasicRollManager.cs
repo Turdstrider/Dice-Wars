@@ -1,4 +1,5 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BasicRollManager : MonoBehaviour
 {
@@ -33,7 +34,12 @@ public class BasicRollManager : MonoBehaviour
 
     public void RollDice(Vector3 targetPos) //Called by ObjectSelector.
     {
+
         Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>(); //get the rigidbody of the selected die.
+
+        //Prevent rolling if the die is already moving.
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+            return;
 
         Vector3 direction = targetPos - rb.position; //calculate the direction from the die to the target position.
         direction.y = 0f; //set y to 0, making the vector strictly horizontal.
@@ -53,9 +59,20 @@ public class BasicRollManager : MonoBehaviour
         rb.AddTorque(Random.insideUnitSphere * 1f, ForceMode.Impulse); //adds a random torque to the die to make it roll.
     }
 
-    public void AdjustElevation()
+    public float GetElevation()
     {
-        
+        return elevation;
+    }
+
+    public float[] GetPowerValues()
+    {
+        float[] powers = { minPower, maxPower, maxDistance };
+        return powers;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
     }
 
     private void Update()
