@@ -37,8 +37,8 @@ public class BasicRollManager : MonoBehaviour
 
         Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>(); //get the rigidbody of the selected die.
 
-        //Prevent rolling if the die is already moving.
-        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+        //Prevent rolling if the die is already moving or the ObjectSelector is selecting a Dice.
+        if (rb.linearVelocity.sqrMagnitude > 0.001f)
             return;
 
         Vector3 direction = targetPos - rb.position; //calculate the direction from the die to the target position.

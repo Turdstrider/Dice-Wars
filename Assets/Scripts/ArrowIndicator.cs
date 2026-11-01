@@ -5,6 +5,8 @@ public class ArrowIndicator : MonoBehaviour
 {
     private BasicRollManager basicRollManager;
     private IndicatorManager indicatorManager;
+    private ObjectSelector selector;
+    private MeshRenderer mesh;
 
     private float minPower; //These are automatically assigned from BasicRollManager.
     private float maxPower;
@@ -14,6 +16,8 @@ public class ArrowIndicator : MonoBehaviour
     {
         indicatorManager = FindFirstObjectByType<IndicatorManager>();
         basicRollManager = GetComponentInParent<BasicRollManager>();
+        selector = Camera.main.GetComponent<ObjectSelector>();
+        mesh = GetComponentInChildren<MeshRenderer>();
 
         minPower = basicRollManager.GetPowerValues()[0];
         maxPower = basicRollManager.GetPowerValues()[1];
@@ -22,6 +26,16 @@ public class ArrowIndicator : MonoBehaviour
 
     private void Update()
     {    
+        Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>(); //get the rigidbody of the selected die.
+
+        //Check if cursor is on a Dice, if the raycast returns nothing or if the Dice is moving.
+        if(!indicatorManager.GetShowArrow() || rb.linearVelocity.sqrMagnitude > 0.001f) 
+        {
+            mesh.enabled = false; //makes the arrow invisible.
+            return; //prevents preceding code from running.
+        }
+        mesh.enabled = true; //makes the arrow visible.
+
         Vector3 targetPos = indicatorManager.GetRaycast();
         float elevation = basicRollManager.GetElevation();
 

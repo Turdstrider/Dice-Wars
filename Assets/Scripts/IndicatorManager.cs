@@ -10,7 +10,7 @@ public class IndicatorManager: MonoBehaviour
     private GameObject select;
     private MeshRenderer hoverMesh;
     private Vector3 raycastPoint; //Stores vector3 of raycast hit.
-    private bool isRaycastHit; 
+    private bool ShowArrow; 
 
     private void Awake()
     {
@@ -46,9 +46,9 @@ public class IndicatorManager: MonoBehaviour
         return raycastPoint;
     }
 
-    public bool GetisRaycastHit()
+    public bool GetShowArrow()
     {
-        return isRaycastHit;
+        return ShowArrow;
     }
 
     void Update() // Update is called once per frame
@@ -59,22 +59,25 @@ public class IndicatorManager: MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
         {
+            
             if (hit.collider.CompareTag("Dice")) //if Collider is from a Dice.
             {
                 hover.transform.position = hit.collider.transform.position;
                 hoverMesh.enabled = true;
+                ShowArrow = false;
                 //make indicator appear on the Dice.
             }
             else //If there is no selected Die.
             {
                 hoverMesh.enabled = false;
+                ShowArrow = true;
             }
             raycastPoint = hit.point; //store point of collision.
-            isRaycastHit = true;
+            
         }
         else
         {
-            isRaycastHit = false;
+            ShowArrow = false;
         }
     }
 }

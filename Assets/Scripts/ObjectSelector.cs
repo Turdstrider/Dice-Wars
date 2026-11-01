@@ -83,9 +83,7 @@ public class ObjectSelector : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
         {
-            if (currentRollManager != null) //If there is a currently selected die.
-                currentRollManager.RollDice(hit.point); //Rolls the currently selected die.
-
+            
             if (hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.
             {
                 if(currentSelectedDie != null)
@@ -97,6 +95,8 @@ public class ObjectSelector : MonoBehaviour
                 currentSelectedDie = manager.gameObject; //Set currently selected die to this.
                 currentRollManager = indicatorManager.CreateSelectIndicator(); //Creates a select indicator on the selected Die.
             }
+            else if (currentRollManager != null) //If there is a currently selected die.
+                currentRollManager.RollDice(hit.point); //Rolls the currently selected die.
         }
     }
 
