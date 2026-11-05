@@ -29,10 +29,10 @@ public class ArrowIndicator : MonoBehaviour
         Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>(); //get the rigidbody of the selected die.
 
         //Check if cursor is on a Dice, if the raycast returns nothing or if the Dice is moving.
-        if(!indicatorManager.GetShowArrow() || rb.linearVelocity.sqrMagnitude > 0.001f) 
+        if(!indicatorManager.GetShowArrow() || rb.linearVelocity.sqrMagnitude > 0.001f || rb.angularVelocity.sqrMagnitude > 0.001f) 
         {
             mesh.enabled = false; //makes the arrow invisible.
-            return; //prevents preceding code from running.
+            return; //prevents following code from running.
         }
         mesh.enabled = true; //makes the arrow visible.
 

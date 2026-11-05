@@ -8,6 +8,7 @@ public class ObjectSelector : MonoBehaviour
     private InputAction select;
     private InputAction scroll;
     [SerializeField] private int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
+    [SerializeField] private LayerMask selectionMask;
     private const string SelectAction = "Select";
     private const string ScrollAction = "Scroll";
     private IndicatorManager indicatorManager;
@@ -43,10 +44,10 @@ public class ObjectSelector : MonoBehaviour
     private void OnDisable()
     {  
         if (select != null)
-            select.performed += OnSelect;
+            select.performed -= OnSelect;
         
         if (scroll != null)
-            scroll.performed += OnScroll;
+            scroll.performed -= OnScroll;
     }
 
     private void OnSelect(InputAction.CallbackContext context)
@@ -79,9 +80,7 @@ public class ObjectSelector : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue(); //Gets the position of the mouse.
         Ray ray = cam.ScreenPointToRay(mousePos); //Create a Ray that goes from the current camera's position to the position of the mouse.
 
-        
-
-        if (Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionMask)) //If ray hits a collider (that isn't a face).
         {
             
             if (hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.

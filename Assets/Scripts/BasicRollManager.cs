@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -32,13 +33,34 @@ public class BasicRollManager : MonoBehaviour
         Debug.Log($"Launch elevation: {elevation}°");
     }
 
+    private IEnumerator WaitForDiceToRest() //Coroutine that waits until the Dice is at rest. One dice is at rest it triggers face detection.
+    {
+        Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>();
+
+        // Wait until the Dice actually starts moving.
+        while (rb.linearVelocity.sqrMagnitude <= 0.001f && rb.angularVelocity.sqrMagnitude <= 0.001f)
+        {
+            yield return null;
+        }
+
+        // Now wait until the Dice comes to rest.
+        while (rb.linearVelocity.sqrMagnitude > 0.001f || rb.angularVelocity.sqrMagnitude > 0.001f)
+        {
+            yield return null;
+        }
+
+        FaceDetector detector = selector.currentSelectedDie.GetComponentInChildren<FaceDetector>();
+
+        detector.DetectFace();
+    }
+
     public void RollDice(Vector3 targetPos) //Called by ObjectSelector.
     {
 
         Rigidbody rb = selector.currentSelectedDie.GetComponent<Rigidbody>(); //get the rigidbody of the selected die.
 
         //Prevent rolling if the die is already moving or the ObjectSelector is selecting a Dice.
-        if (rb.linearVelocity.sqrMagnitude > 0.001f)
+        if (rb.linearVelocity.sqrMagnitude > 0.001f || rb.angularVelocity.sqrMagnitude > 0.001f)
             return;
 
         Vector3 direction = targetPos - rb.position; //calculate the direction from the die to the target position.
@@ -57,7 +79,9 @@ public class BasicRollManager : MonoBehaviour
         rb.AddForce(launchDirection * power, ForceMode.Impulse); 
         Debug.Log("Power: " + power);
         rb.AddTorque(Random.insideUnitSphere * 1f, ForceMode.Impulse); //adds a random torque to the die to make it roll.
+        StartCoroutine(WaitForDiceToRest());
     }
+    
 
     public float GetElevation()
     {

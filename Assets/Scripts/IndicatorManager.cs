@@ -6,6 +6,7 @@ public class IndicatorManager: MonoBehaviour
     private Camera cam;
     [SerializeField] private GameObject hoverIndicator;
     [SerializeField] private GameObject selectIndicator;
+    [SerializeField] private LayerMask selectionMask;
     private GameObject hover;
     private GameObject select;
     private MeshRenderer hoverMesh;
@@ -57,7 +58,7 @@ public class IndicatorManager: MonoBehaviour
         Ray ray = cam.ScreenPointToRay(mousePos); //Create a Ray that goes from the current camera's position to the position of the mouse.
         
 
-        if (Physics.Raycast(ray, out RaycastHit hit)) //If ray hits a collider.
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionMask)) //If ray hits a collider.
         {
             
             if (hit.collider.CompareTag("Dice")) //if Collider is from a Dice.
