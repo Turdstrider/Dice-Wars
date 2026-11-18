@@ -7,13 +7,14 @@ public class ObjectSelector : MonoBehaviour
     private InputActionMap controls;
     private InputAction select;
     private InputAction scroll;
-    [SerializeField] private int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
+    public int ownerID; //determines the player. Makes it so it can only interact with dice of the same ownerNum.
     [SerializeField] private LayerMask selectionMask;
     private const string SelectAction = "Select";
     private const string ScrollAction = "Scroll";
     private IndicatorManager indicatorManager;
     public GameObject currentSelectedDie;
     public BasicRollManager currentRollManager;
+    private DiceStatText diceStatText;
 
     private void Awake() //triggers when the object awakens.
     {
@@ -27,6 +28,8 @@ public class ObjectSelector : MonoBehaviour
         scroll = controls.FindAction("Scroll");
 
         indicatorManager = FindFirstObjectByType<IndicatorManager>();
+
+        diceStatText = FindAnyObjectByType<DiceStatText>();
         
     }
 
@@ -97,9 +100,10 @@ public class ObjectSelector : MonoBehaviour
             else if (currentRollManager != null) //If there is a currently selected die.
                 currentRollManager.RollDice(hit.point); //Rolls the currently selected die.
         }
+        diceStatText.ChangeText();
     }
 
-    private void ClearSelection()
+    public void ClearSelection()
     {
         Debug.Log("Deselected.");
         if(currentSelectedDie != null)
@@ -109,5 +113,6 @@ public class ObjectSelector : MonoBehaviour
             indicatorManager.DestroySelectIndicator(); //Destroys the select indicator.
             currentRollManager = null; //Set currentRollManager to null.
         }
+        diceStatText.ChangeText();
     }
 }
