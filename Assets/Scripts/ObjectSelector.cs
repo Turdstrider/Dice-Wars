@@ -14,6 +14,7 @@ public class ObjectSelector : MonoBehaviour
     private IndicatorManager indicatorManager;
     public GameObject currentSelectedDie;
     public BasicRollManager currentRollManager;
+    public SelectionManager currentSelectionManager;
     private DiceStatText diceStatText;
 
     private void Awake() //triggers when the object awakens.
@@ -85,27 +86,26 @@ public class ObjectSelector : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, selectionMask)) //If ray hits a collider (that isn't a face).
         {
-            
             if (hit.collider.CompareTag("Dice") && hit.collider.gameObject.GetComponent<SelectionManager>().ownerID == this.ownerID) //if Collider is from a Dice that it owns.
             {
                 if(currentSelectedDie != null)
                     currentSelectedDie.GetComponent<SelectionManager>().DeSelect(); //Deselects the currently selected die if there is one.
-               
-                Debug.Log("Selected");
-                SelectionManager manager = hit.collider.gameObject.GetComponent<SelectionManager>();
-                manager.Select();
-                currentSelectedDie = manager.gameObject; //Set currently selected die to this.
+                currentSelectionManager = hit.collider.gameObject.GetComponent<SelectionManager>();
+                currentSelectionManager.Select();
+                currentSelectedDie = currentSelectionManager.gameObject; //Set currently selected die to this.
                 currentRollManager = indicatorManager.CreateSelectIndicator(); //Creates a select indicator on the selected Die.
             }
-            else if (currentRollManager != null) //If there is a currently selected die.
+            else if (currentRollManager != null && currentSelectionManager.basicRollCount > 0) //If there is a currently selected die that has a Basic Roll available.
+            {
                 currentRollManager.RollDice(hit.point); //Rolls the currently selected die.
+                currentSelectionManager.basicRollCount -= 1; //Use the Basic Roll.
+            } 
         }
         diceStatText.ChangeText();
     }
 
     public void ClearSelection()
     {
-        Debug.Log("Deselected.");
         if(currentSelectedDie != null)
         {
             currentSelectedDie.GetComponent<SelectionManager>().DeSelect();

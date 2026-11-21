@@ -22,6 +22,8 @@ public class BasicRollManager : MonoBehaviour
         selector = Camera.main.GetComponent<ObjectSelector>();
     }
 
+    
+
     public void AdjustElevation(float scrollValue) //Called by ObjectSelector. Changes the elevation angle.
     {   
         //Clamps the elevation.

@@ -18,7 +18,7 @@ public class DiceStatText : TextUpdater
     {
         if(objectSelector.currentSelectedDie != null)
         {
-            textMesh.text = "Dice: " + objectSelector.currentSelectedDie.name;
+            textMesh.text = "Dice: " + objectSelector.currentSelectedDie.name + "\nBasic Rolls: " + objectSelector.currentSelectionManager.basicRollCount;
         }
         else
         {

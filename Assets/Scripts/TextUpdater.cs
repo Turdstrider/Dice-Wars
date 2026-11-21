@@ -11,6 +11,6 @@ public abstract class TextUpdater : MonoBehaviour //abstract classes cannot be u
         textMesh = GetComponent<TextMeshProUGUI>();
     }
 
-    //Abstract function. Is called by ending your turn..
+    //Abstract function. Is to be overidden by its children.
     public abstract void ChangeText();
 }
